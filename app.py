@@ -3,8 +3,8 @@ import numpy as np
 import datetime
 from bokeh.plotting import figure
 from bokeh.embed import components
-import urllib.request
-#import urllib2
+#import urllib.request
+import urllib2
 import simplejson as json
 import pandas as pd
 
@@ -34,8 +34,8 @@ def plot():
 
     #reading all the data
     url2 = 'https://www.quandl.com/api/v3/datatables/WIKI/PRICES.json?api_key=TyZPdNdmtsuH81Akw4Ck'
-    data = urllib.request.urlopen(url2).read()#request.get(url2)
-    #data = urllib2.urlopen(url2).read()
+    #data = urllib.request.urlopen(url2).read()#request.get(url2)
+    data = urllib2.urlopen(url2).read()
     parsed_data = json.loads(data)
 
     col_names = [colname['name'] for colname in parsed_data['datatable']['columns']]
