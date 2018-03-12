@@ -1,10 +1,6 @@
 from flask import Flask, render_template, request, redirect
 import numpy as np
 import datetime
-from bokeh.plotting import figure
-from bokeh.embed import components
-#import urllib.request
-import urllib2
 import simplejson as json
 import pandas as pd
 
@@ -12,67 +8,66 @@ app = Flask(__name__)
 
 app.vars = {}
 
-@app.route('/',methods=['GET','POST'])
-def index():
-    return render_template('index.html')
+@app.route('/home',methods=['GET','POST'])
+def home():
+    return render_template('html/Home.html')
 
-#used to filter out year
-def compare_year(date_input):
-    year = [year_date[:4] for year_date in date_input]
-    return pd.Series(year)
 
-@app.route('/plot',methods=['GET','POST'])
-def plot():
-    #get all the values from the previous index.html
-    app.vars['ticker'] = request.form['ticker']
-    app.vars['features']  = request.form.getlist('features')
+@app.route('/apartmentFinder',methods=['GET','POST'])
+def aptFinder():
+    return render_template('html/apartmentFinder.html')
 
-    #ensuring that it is not anything else
-    tickername = app.vars['ticker'].upper()
-    features = app.vars['features']
-    year = '2017'
+@app.route('/apartmentRecommender',methods=['GET','POST'])
+def aptRecommender():
+    posts_ = False
+    if request.method == 'GET':
+        posts_ = False
+        return render_template('html/apartmentRecommender.html', posted = posts_)
+    elif request.method == 'POST':
+        import numpy as np
+        from sklearn.decomposition import PCA
+        from sklearn.preprocessing import StandardScaler
+        from scipy import spatial
 
-    #reading all the data
-    url2 = 'https://www.quandl.com/api/v3/datatables/WIKI/PRICES.json?api_key=TyZPdNdmtsuH81Akw4Ck'
-    #data = urllib.request.urlopen(url2).read()#request.get(url2)
-    data = urllib2.urlopen(url2).read()
-    parsed_data = json.loads(data)
+        #scaling data
+        data_scaler = StandardScaler()
+        full_aptDF = pd.read_csv("./static/other/unique_aptDF.csv", index_col=None)
+        filtered_aptDF_scaled = full_aptDF
+        filtered_aptDF_scaled = pd.DataFrame(filtered_aptDF_scaled,columns = ["Rent","distanceToPurdue","crimeRate"])
+        filtered_aptDF_scaled = pd.DataFrame(data_scaler.fit_transform(filtered_aptDF_scaled),columns = ["Rent","distanceToPurdue","crimeRate"])
 
-    col_names = [colname['name'] for colname in parsed_data['datatable']['columns']]
-    df1 = pd.DataFrame(parsed_data['datatable']['data'])
-    df1.columns = col_names
+        #pca
+        apt_pca = PCA(n_components=2)
+        apt_reduced = apt_pca.fit_transform(filtered_aptDF_scaled)
 
-    #filtering only the ticker mention and the year
-    new_data = df1[(df1['ticker'] == tickername) & (compare_year(df1['date'])==year)]
+        #get data from users
 
-    #initializing plots
-    p1 = figure(x_axis_type="datetime", title="Quandl WIKI EOD Stock Prices - 2017")
-    p1.grid.grid_line_alpha=0.3
-    p1.xaxis.axis_label = 'Date'
-    p1.yaxis.axis_label = 'Price'
+        app.vars['most'] = request.form['most_important']
+        app.vars['med'] = request.form['med_important']
+        app.vars['least'] = request.form['least_important']
+        app.vars['values'] = request.form.getlist('impt_val')
 
-    #plot line
-    if 'close' in features:
-        legend_name1 = tickername + ": close"
-        p1.line(pd.to_datetime(new_data['date']), new_data['close'], color='#A6CEE3', legend=legend_name1)
+        users_data = {app.vars['most']:float(app.vars['values'][0]),
+                        app.vars['med']: float(app.vars['values'][1]),
+                        app.vars['least']: float(app.vars['values'][2])}
+        user_input = np.array([users_data['rent'],users_data['dist'],users_data['safety']]).reshape(1, -1)
+        pt = apt_pca.transform(data_scaler.transform(user_input))
+        top_5_apts = spatial.KDTree(apt_reduced).query(pt,k=5)[1][0]
+        top_5_apts_name = full_aptDF.iloc[top_5_apts,:]
+        top_5_apts_name = top_5_apts_name.reset_index()
+        result = top_5_apts_name.to_json()
 
-    if 'adj_close' in features:
-        legend_name2 = tickername + ": adj_close"
-        p1.line(pd.to_datetime(new_data['date']), new_data['adj_close'], color='#B2DF8A', legend=legend_name2)
+        f = open('output_test_recommend.txt','w')
+        f.write('most: %s\n'%(app.vars['most']))
+        f.write('med: %s\n\n'%(app.vars['med']))
+        f.write('least: %s\n'%(app.vars['least']))
+        f.write('values: %s\n\n'%("\n".join(app.vars['values'])))
+        f.write('apt names: %s\n\n'%("\n".join(top_5_apts_name.AptName)))
+        f.close()
+        posts_ = True
+        return render_template('html/apartmentRecommender.html', result = result, posted = posts_)
 
-    if  'open' in features:
-        legend_name3 = tickername + ": open"
-        p1.line(pd.to_datetime(new_data['date']), new_data['open'], color='#33A02C', legend=legend_name3)
 
-    if 'adj_open' in features:
-        legend_name4 = tickername + ": adj_open"
-        p1.line(pd.to_datetime(new_data['date']), new_data['adj_open'], color='#FB9A99', legend=legend_name4)
-
-    p1.legend.location = "top_right"
-
-    script, div = components(p1)
-
-    return render_template('plot.html', script = script, div= div, ticker = tickername, features = features)
 
 if __name__ == '__main__':
-  app.run()#debug=True)#port=33507)
+    app.run(debug=True)

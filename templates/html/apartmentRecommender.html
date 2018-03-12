@@ -1,0 +1,220 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Finding Perfect Apartment</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/css/jumbotron.css" rel="stylesheet">
+
+    <!--Radar Charts-->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+	  <script src="/static/js/RadarChart.js"></script>
+    <!--link rel="stylesheet" href="add_js.css"-->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!--Initializing Google Map & API-->
+    <style>
+      #chart {
+      position: absolute;
+      top: 50px;
+      left: 30px;
+      }
+
+      #map{
+        width: 500px;
+        height: 400px;
+        background-color: grey;
+        position: absolute;
+        top: 50px;
+      }
+
+      .bs-example  div[class^="col"] {
+      border: 1px solid white;
+      text-align: center;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      }
+    </style>
+    <script type="text/javascript">
+
+        function initMap(){
+          var mapDiv = document.getElementById('map');
+          var map = new google.maps.Map(mapDiv, {
+            center: {lat: 40.4247621, lng: -86.913649},
+            zoom: 15});
+
+          var marker = new google.maps.Marker({ //Line 1
+            position: {lat: 40.4247621, lng: -86.913649}, //Line2: Location to be highlighted
+            map: map,//Line 3: Reference to map object
+            title: 'Purdue University' //Line 4: Title to be given
+          });
+
+          var marker2 = new google.maps.Marker({ //Line 1
+            position: {lat: 40.4255495, lng: -86.9207049}, //Line2: Location to be highlighted
+            map: map,//Line 3: Reference to map object
+            title: 'Purdue University' //Line 4: Title to be given
+          });
+
+          //if I want to add transitLayer
+          var transitLayer = new google.maps.TransitLayer();
+              transitLayer.setMap(); //map
+
+          //if I want to add bikeLayer
+          var bikeLayer = new google.maps.BicyclingLayer();
+              bikeLayer.setMap(); //map
+        }
+      </script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+ 	    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+      <!--script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCsGdIQHnPHqeMfoUUaqPMBn91KYUrZuwI&callback="></script-->
+      <!--script type="text/javascript" src="/static/js/recommender.js"></script-->
+      <script> var posted = '{{posted}}';</script>
+
+  </head>
+
+  <body>
+
+    <div class="container">
+      <header class="header clearfix">
+        <nav>
+          <ul class="nav nav-pills float-right">
+            <li class="nav-item">
+              <a class="nav-link " href="home">Project Overview </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="apartmentFinder">Find an Apartment </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active " href="apartmentRecommender">Recommend Me! <span class="sr-only">(current)</span></a>
+            </li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">Apartment Recommender</h3>
+      </header>
+
+      <main role="main">
+
+        <div class="jumbotron">
+
+          <div class="row" >
+
+            <form method="post" id = "formRecommender">
+              <label class="control-label " for="region_id">Important variables:</label>
+              <div class="form-row align-items-center">
+                  <div class="col form-group has-success has-feedback ">
+                      <!--label class="col-xs-2 control-label" for="inputSuccess">Most Important</label-->
+                      <div class="form-group"> <!-- Message input !-->
+                        <!--label class="control-label " for="region_id">Most Important</label-->
+                        <select class="form-control" id="most_important" name="most_important">
+                          <option value="rent">Rent</option>
+                          <option value="dist">Distance to Campus (in mi)</option>
+                          <option value="safety">Safety Index ([0,1] 1 is safest)</option>
+                        </select>
+                      </div>
+                      <div class="col-xs-2">
+                          <input type="text" name="impt_val" class="form-control" placeholder="1000" width="10px">
+                      </div>
+                  </div>
+                  <div class="col form-group has-warning has-feedback">
+                      <!--label class="col-xs-2 control-label" for="inputWarning">Distance to Campus</label-->
+                      <div class="form-group"> <!-- Message input !-->
+                        <!--label class="control-label " for="region_id"> Medium Important </label-->
+                        <select class="form-control" id="med_important" name="med_important">
+                          <option value="dist">Distance to Campus (in mi)</option>
+                          <option value="rent">Rent</option>
+                          <option value="safety">Safety Index ([0,1] 1 is safest)</option>
+                        </select>
+                      </div>
+                      <div class="col-xs-2">
+                          <input type="text" name="impt_val" class="form-control" placeholder="1.4">
+                      </div>
+                  </div>
+                  <div class="col form-group has-error has-feedback">
+                    <div class="col-xs-2">
+                      <!--label class="col-xs-2 control-label" for="inputError">Safety Index</label-->
+                      <div class="form-group"> <!-- Message input !-->
+                        <!--label class="control-label " for="region_id">Least Important</label-->
+                        <select class="form-control" id="least_important" name="least_important">
+                          <option value="safety">Safety Index ([0,1] 1 is safest)</option>
+                          <option value="rent">Rent</option>
+                          <option value="dist">Distance to Campus (in mi)</option>
+
+                        </select>
+                      </div>
+                          <input type="text" name="impt_val" class="form-control" placeholder=".3">
+                      </div>
+                  </div>
+                  <div class="form-group align-items-right" style = "width:100px">
+                  </div>
+
+                  <div class="form-group align-items-right"> <!--
+                    Submit button <button class="btn btn-primary " name="submit" type="submit">Submit</button>!-->
+                    <button type="submit" id ="submit_btn" class="btn btn-primary">Submit</button>
+
+                  </div>
+                  </div>
+            </form>
+
+          </div>
+
+          <!--This is for map and radar plot-->
+          <div class="row">
+            <!--This is for map -->
+            <div class="col-sm-6" style = "background-color:white; height:500px">
+              <div id="map"></div>
+            </div>
+            <!--This is for radar plot-->
+            <div class="col-sm-6">
+              Top 5 recomended apartments:
+              <div class="row" id="rec1" style = "background-color:white">
+                1.  Blackbird Farms Rent: $1010 </br> Address: 2411 Kestral Blvd., West Lafayette IN 47906
+              </div>
+              <div class="row" id="rec2" style = "background-color:light-grey">
+                2. Peppermill Village Apartments Rent: $887 </br> Address: 3366 Peppermill Drive, West Lafayette IN 47906
+              </div>
+              <div class="row" id="rec3" style = "background-color:white">
+                3. Salin Town Homes Rent: $925</br>Address: 605 West Street, Lafayette IN 47905</div>
+              <div class="row" id="rec4" style = "background-color:light-grey"  >
+                4. Mccormick Place Apartments Rent: $810 </br>Address: 2110 McCormick Road, West Lafayette IN 47906
+              </div>
+              <div class="row" id="rec5" style = "background-color:white">
+                510 romig st. Rent: $850 </br> Address: 510 romig, lafayette IN 47901
+              </div>
+          </div>
+        </div>
+      </main>
+
+      <script> //KEEP GIVING ERROR where JSON cannot be parsed.... should only fulfill the if statement after 'POST' not 'GET' but still giving issues
+        ///debugger;
+        /*
+        console.log("posted: "+posted);
+        if(posted == 'True'){
+          console.log("posted: "+posted);
+          var res = JSON.parse({{result|tojson}});
+
+          document.getElementById("rec1").innerHTML = "1. "+res["AptName"][0]+ "    Rent: $" + res["Rent"][0] + "</br>" + "Address: " + res["AptAddress"][0]
+          document.getElementById("rec2").innerHTML = "2. "+res["AptName"][1]+ "    Rent: $" + res["Rent"][1] + "</br>" + "Address: " + res["AptAddress"][1]
+          document.getElementById("rec3").innerHTML = "3. "+res["AptName"][2]+ "    Rent: $" + res["Rent"][2] + "</br>" + "Address: " + res["AptAddress"][2]
+          document.getElementById("rec4").innerHTML = "4. "+res["AptName"][3]+ "    Rent: $" + res["Rent"][3] + "</br>" + "Address: " + res["AptAddress"][3]
+          document.getElementById("rec5").innerHTML = "5. "+res["AptName"][4]+ "    Rent: $" + res["Rent"][4] + "</br>" + "Address: " + res["AptAddress"][4]
+      }*/
+      </script>
+
+      <footer class="footer">
+        &copy; Ellen Wongso - <a href="https://www.thedataincubator.com/">TDI</a> Capstone Project Winter 2018
+      </footer>
+
+    </div> <!-- /container -->
+  </body>
+  <!--Load the google map-->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCsGdIQHnPHqeMfoUUaqPMBn91KYUrZuwI&callback=initMap"></script>
+
+</html>

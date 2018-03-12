@@ -1,0 +1,120 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Finding Perfect Apartment</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/css/jumbotron.css" rel="stylesheet">
+
+    <!--Radar Charts-->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+	  <script src="/static/js/RadarChart.js"></script>
+    <link rel="stylesheet" href="https://rawgit.com/tpreusse/radar-chart-d3/master/src/radar-chart.css">
+    <!--link rel="stylesheet" href="add_js.css"-->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!--Initializing Google Map & API-->
+    <style>
+      #chart {
+      position: absolute;
+      top: 50px;
+      left: 30px;
+      }
+
+      #map{
+        width: 500px;
+        height: 400px;
+        background-color: grey;
+        position: absolute;
+        top: 50px;
+      }
+
+      .bs-example  div[class^="col"] {
+      border: 1px solid white;
+      text-align: center;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      }
+    </style>
+
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCsGdIQHnPHqeMfoUUaqPMBn91KYUrZuwI&callback="></script>
+     <script type="text/javascript" src="/static/js/uniqueAptDF.js"></script>
+     <script type="text/javascript" src="/static/js/map.js"></script>
+  </head>
+
+  <body>
+
+    <div class="container">
+      <header class="header clearfix">
+        <nav>
+          <ul class="nav nav-pills float-right">
+            <li class="nav-item">
+              <a class="nav-link " href="home">Project Overview </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="apartmentFinder">Find an Apartment <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="apartmentRecommender">Recommend Me! </a>
+            </li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">Apartment Finder</h3>
+      </header>
+
+      <main role="main">
+
+        <div class="jumbotron">
+          <div class="row">
+            <div class="col-sm-6" style = "background-color:white; height:120px">
+              filter by: Rent
+              <form method="get" id="filterByRent">
+                Maximum Rent: $<input id="maxrent" type="text" name="rent">/month
+              </br></br>
+                <button type="submit" class="btn btn-primary btn-xs">Submit</button>
+              </form>
+            </div>
+            <div class="col-sm-6" name = "clear_submit" style = "background-color:white; height:120px">
+              Apartment Selected (compare up to 3 apartments): <button type="submit" id = "clear_submit_btn"class="btn btn-primary btn-xs">Clear</button>
+            </br>
+              <div class="row" id ="selected_1" style = "background: rgba(253,243,115, 0.7);"> 1. </div>
+              <div class="row" id ="selected_2" style = "background: rgba(36,228,86, 0.7);"> 2. </div>
+              <div class="row" id ="selected_3" style = "background: rgba(142,108,249, 0.7);"> 3. </div>
+
+            </div>
+          </div>
+          <!--This is for map and radar plot-->
+          <div class="row">
+            <!--This is for map -->
+            <div class="col-sm-6" style = "background-color:white; height:500px">
+              <div class="row" id ="noApartments_filtered" style = "background: white;"> Apartment available: </div>
+              <div id="map"></div>
+            </div>
+            <!--This is for radar plot-->
+            <div class="col-sm-6" style = "background-color:light-grey; height:500px">
+              <div class="radarChart"></div>
+              <!--script type="text/javascript" src="../js/script.js"></script-->
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        &copy; Ellen Wongso - <a href="https://www.thedataincubator.com/">TDI</a> Capstone Project Winter 2018
+      </footer>
+
+    </div> <!-- /container -->
+  </body>
+  <!--Load the google map-->
+  <!--script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCsGdIQHnPHqeMfoUUaqPMBn91KYUrZuwI&callback=initMap"></script-->
+</html>

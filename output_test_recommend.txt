@@ -1,0 +1,14 @@
+most: rent
+med: dist
+
+least: safety
+values: 1000
+1.4
+.3
+
+apt names: Blackbird Farms
+Peppermill Village Apartments
+Salin Town Homes
+Mccormick Place Apartments
+510 romig st.
+

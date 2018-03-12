@@ -1,0 +1,45 @@
+/* Move down content because we have a fixed navbar that is 3.5rem tall */
+body {
+  padding-top: 3.5rem;
+}
+
+.header {
+  padding-bottom: 1rem;
+  border-bottom: .05rem solid #e5e5e5;
+  margin-bottom: 2rem;
+}
+
+.jumbotron {
+  padding-top: .5rem;
+  text-align: center;
+
+  background-color:white;/* light-grey;*/
+  /*border-bottom: .05rem solid #e5e5e5;*/
+}
+/*.jumbotron .btn {
+  padding: .5rem .5rem;
+  font-size: 1rem;
+}*/
+
+@media (min-width: 992px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+.bg-image-full {
+  background: no-repeat center center scroll;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
+/* Custom page footer */
+.footer {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-top: .5rem;
+  color: #777;
+  border-top: .05rem solid #e5e5e5;
+}

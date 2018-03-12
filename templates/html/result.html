@@ -1,0 +1,207 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Finding Perfect Apartment</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="../css/jumbotron.css" rel="stylesheet">
+
+    <!--Radar Charts-->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+	  <script src="../js/RadarChart.js"></script>
+    <!--link rel="stylesheet" href="add_js.css"-->
+    <link rel="stylesheet" href="../css/style.css">
+    <!--Initializing Google Map & API-->
+    <style>
+      #chart {
+      position: absolute;
+      top: 50px;
+      left: 30px;
+      }
+
+      #map{
+        width: 500px;
+        height: 400px;
+        background-color: grey;
+        position: absolute;
+        top: 50px;
+      }
+
+      .bs-example  div[class^="col"] {
+      border: 1px solid white;
+      text-align: center;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      }
+    </style>
+    <script type="text/javascript">
+        function initMap(){
+          var mapDiv = document.getElementById('map');
+          var map = new google.maps.Map(mapDiv, {
+            center: {lat: 40.4247621, lng: -86.913649},
+            zoom: 15});
+
+          var marker = new google.maps.Marker({ //Line 1
+            position: {lat: 40.4247621, lng: -86.913649}, //Line2: Location to be highlighted
+            map: map,//Line 3: Reference to map object
+            title: 'Purdue University' //Line 4: Title to be given
+          });
+
+          var marker2 = new google.maps.Marker({ //Line 1
+            position: {lat: 40.4255495, lng: -86.9207049}, //Line2: Location to be highlighted
+            map: map,//Line 3: Reference to map object
+            title: 'Purdue University' //Line 4: Title to be given
+          });
+
+          //if I want to add transitLayer
+          var transitLayer = new google.maps.TransitLayer();
+              transitLayer.setMap(); //map
+
+          //if I want to add bikeLayer
+          var bikeLayer = new google.maps.BicyclingLayer();
+              bikeLayer.setMap(); //map
+        }
+      </script>
+  </head>
+
+  <body>
+
+    <div class="container">
+      <header class="header clearfix">
+        <nav>
+          <ul class="nav nav-pills float-right">
+            <li class="nav-item">
+              <a class="nav-link " href="Home.html">Project Overview </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="apartmentFinder.html">Find an Apartment </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active " href="apartmentRecommender.html">Recommend Me! <span class="sr-only">(current)</span></a>
+            </li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">Apartment Recommender</h3>
+      </header>
+
+      <main role="main">
+
+        <div class="jumbotron">
+          <!--This is for filter-->
+          <!--div class="row">
+            <!--This is for filter: RENT-->
+            <!--div class="col-sm-6" style = "background-color:red; height: 100px">
+              <section class="range-slider">
+                Rent: <span class="rangeValues"></span>
+                <input value="0" min="0" max="5000" step="50" type="range">
+                <input value="5000" min="0" max="5000" step="50" type="range">
+              </section>
+              <!--script src="slider.js"></script-->
+              <!--script  src="js/index.js"></script>
+            </div>
+            <!--This is for filter: factors-->
+            <!--form>
+              <div class="col-sm-6" style = "background-color:white;text-align:left">
+                <div class="row">
+                  <div class="col-sm-6" style = "background-color:green">
+                    <div class="checkbox"><label><input type="checkbox" checked="checked" value="">Rent</label></div>
+                    <div class="checkbox"><label><input type="checkbox" checked="checked" value="">Safety Index</label></div>
+                    <div class="checkbox"><label><input type="checkbox" checked="checked" value="">No Grocery (2 mi)</label></div>
+                    <div class="checkbox"><label><input type="checkbox" checked="checked" value="">Time to Purdue (car)/label></div>
+                  </div>
+                  <div class="col-sm-6" style = "background-color:grey">
+                    <div class="checkbox"><label><input type="checkbox" checked="checked" value="">Time to Purdue (bus)</label></div>
+                    <div class="checkbox"><label><input type="checkbox" checked="checked" value="">Time to Purdue (walk)</label></div>
+                    <div class="checkbox"><label><input type="checkbox" checked="checked" value="">No bus to Purdue</label></div>
+                    <div class="checkbox"><label><input type="checkbox" checked="checked" value="">Bus Wait Time</label></div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div-->
+
+          <!--This is for map and radar plot-->
+          <div class="row">
+            <!--This is for map -->
+            <div class="col-sm-6" style = "background-color:white; height:500px">
+              <div id="map"></div>
+            </div>
+            <!--This is for radar plot-->
+            <div class="col-sm-6" style = "background-color:white">
+              <form class="form-horizontal">
+                  <div class="form-group has-success has-feedback">
+                      <!--label class="col-xs-2 control-label" for="inputSuccess">Most Important</label-->
+                      <div class="form-group"> <!-- Message input !-->
+                    		<label class="control-label " for="region_id">Most Important</label>
+                    		<select class="form-control" id="region_id" name="region">
+                    			<option value="North">Rent</option>
+                    			<option value="West">Distance to Campus (in mi)</option>
+                    			<option value="East">Safety Index ([0,1] 1 is safest)</option>
+                    		</select>
+                    	</div>
+                      <div class="col-xs-2">
+                          <input type="text" id="inputSuccess" class="form-control" placeholder="MAX VALUE" width="10px">
+                      </div>
+                  </div>
+                  <div class="form-group has-warning has-feedback">
+                      <!--label class="col-xs-2 control-label" for="inputWarning">Distance to Campus</label-->
+                      <div class="form-group"> <!-- Message input !-->
+                    		<label class="control-label " for="region_id">  </label>
+                    		<select class="form-control" id="region_id" name="region">
+                    			<option value="North">Rent</option>
+                    			<option value="West">Distance to Campus (in mi)</option>
+                    			<option value="East">Safety Index ([0,1] 1 is safest)</option>
+                    		</select>
+                    	</div>
+                      <div class="col-xs-2">
+                          <input type="text" id="inputWarning" class="form-control" placeholder="MAX VALUE">
+                      </div>
+                  </div>
+                  <div class="form-group has-error has-feedback">
+                    <div class="col-xs-2">
+                      <!--label class="col-xs-2 control-label" for="inputError">Safety Index</label-->
+                      <div class="form-group"> <!-- Message input !-->
+                    		<label class="control-label " for="region_id">Least Important</label>
+                    		<select class="form-control" id="region_id" name="region">
+                    			<option value="North">Rent</option>
+                    			<option value="West">Distance to Campus (in mi)</option>
+                    			<option value="East">Safety Index ([0,1] 1 is safest)</option>
+                    		</select>
+                    	</div>
+
+                          <input type="email" id="inputError" class="form-control" placeholder="MAX VALUE">
+                      </div>
+                  </div>
+                  
+              </form>
+
+              <!--div class="row meetup-times">
+                <div class="col s2 center-align">
+                  <div class="row time-label">&nbsp;</div>
+                  <div class="row day-label">RENT</div>
+                  <div class="row day-label">NEAR</div>
+                  <div class="row day-label">SAFETY</div>
+                </div>
+            </div-->
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        &copy; Ellen Wongso - <a href="https://www.thedataincubator.com/">TDI</a> Capstone Project Winter 2018
+      </footer>
+
+    </div> <!-- /container -->
+  </body>
+  <!--Load the google map-->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCsGdIQHnPHqeMfoUUaqPMBn91KYUrZuwI&callback=initMap"></script>
+</html>
